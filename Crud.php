@@ -7,5 +7,9 @@ interface Crud{
     public function update();
     public function removeOne();
     public function removeAll();
+	
+	//Lab 2 bit
+	public function validateForm();
+	public function createFormErrorSessions();	
 }
 ?>

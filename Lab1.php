@@ -9,6 +9,11 @@ if (isset($_POST['btn-save'])) {
     $city = $_POST['city_name'];
 
     $user = new User($first_name, $last_name, $city);
+	if(!$user->validateForm()){
+        $user->createFormErrorSessions();
+        header ("Refresh:0");
+		die();
+    }
     $res = $user->save();
 
     if ($res) {
@@ -16,7 +21,14 @@ if (isset($_POST['btn-save'])) {
     } else {
         echo "An error occured";
     }
+    $res = $user->save();
 
+    if ($res) {
+        echo "Save operation was successful";
+    } else {
+        echo "An error occured";
+    }
+	$con->closeDatabase();
 }
 ?>
 
@@ -30,11 +42,25 @@ if (isset($_POST['btn-save'])) {
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Lab 1</title>
 	<script type= "text/javascript" src="Validate.js"></script>
+	<link rel="stylesheet" type="text/css" href="validate.css">
 </head>
 
 <body>
-    <form method="post" name="user_details" id="user_details" onsubmit="return ValidateForm()" action="<?=$_SERVER['PHP_SELF']?>">
+    <form method="post" name="user_details" id="user_details" onsubmit="return validateForm()" action="<?=$_SERVER['PHP_SELF']?>">
         <table align="center">
+		<tr>
+		<td>
+			<div id="form-errors">
+				<?php	
+					session_start();
+					if(!empty($_SESSION['form_errors'])){
+							echo " " . $_SESSION['form_errors'];
+							unset($_SESSION['form_errors']);
+					}
+				?>
+			</div>
+		</td>
+		</tr>
             <tr>
                 <td>
                     <h1>First Name</h1>
