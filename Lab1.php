@@ -1,22 +1,30 @@
 <?php
 include_once "DBConnector.php";
-include_once "user.php";
+include_once "User.php";
 
 
 if (isset($_POST['btn-save'])) {
     $first_name = $_POST['first_name'];
     $last_name = $_POST['last_name'];
     $city = $_POST['city_name'];
-
-    $user = new User($first_name, $last_name, $city);
+	
+	$username = $_POST['username'];
+	$password = $_POST['password'];
+	
+	$utc_timestamp = $_POST['utc_timestamp'];
+	$offset = $_POST['time_zone_offset'];
+	
+    $user = new User($first_name, $last_name, $city, $usernmae, $password);
+	$uploader = new FileUploader;
 	if(!$user->validateForm()){
         $user->createFormErrorSessions();
         header ("Refresh:0");
 		die();
     }
     $res = $user->save();
+	$file_upload_response = $uploader-> uploadFile();
 
-    if ($res) {
+    if ($res && $file_upload_response) {
         echo "Save operation was successful";
     } else {
         echo "An error occured";
@@ -40,9 +48,13 @@ if (isset($_POST['btn-save'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Lab 1</title>
-	<script type= "text/javascript" src="Validate.js"></script>
+    
+	
+	<title>Lab 1</title>
+		<script type= "text/javascript" src="Validate.js"></script>
 	<link rel="stylesheet" type="text/css" href="validate.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script type ="text/javascript" src="Timezone.js"></script>
 </head>
 
 <body>
@@ -79,9 +91,33 @@ if (isset($_POST['btn-save'])) {
                 </td>
                 <td><input type="text" name="city_name" placeholder="City Name"></td>
             </tr>
+			            <tr>
+                <td>
+                    <h1>User Name</h1>
+                </td>
+                <td><input type="text" name="username" placeholder="User Name"></td>
+            </tr>
+			            <tr>
+                <td>
+                    <h1>Password</h1>
+                </td>
+                <td><input type="password" name="password" placeholder="Password"></td>
+            </tr>
+			<tr>
+                <td>
+                    <h1>Profile Image</h1>
+                </td>
+                <td><input type="file" name="FileToUpload" id="FileToUpload"></td>
+            </tr>
             <tr>
+			
                 <td><button type="submit" name="btn-save"><strong>SAVE</strong></button></td>
             </tr>
+			<input type="hidden" name="utc_timestamp" id="utc_timestamp" value=""/>
+			<input type="hidden" name="time_zone_offset" id="time_zone_offset" value=""/>
+			<tr>
+			<td><a href="Login.php">Login</a></td>
+			</tr>
         </table>
     </form>
 

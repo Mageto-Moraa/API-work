@@ -23,4 +23,3 @@ class DBConnector
 
 
 ?>
-© 2020 GitHub, 

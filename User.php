@@ -39,8 +39,39 @@ class User implements Crud,Authenticator
         return $this->password;
     }	
 		
-		
+	public function hashPassword(){
+        $this->password = password_hash($this->password, PASSWORD_DEFAULT);
+    }
+    public function isPasswordCorrect(){
+        $con = new DBConnector;
+        $found = false;
+        $res = mysql_query("SELECT * FROM user")or die('Error:'. mysql_error());
 
+        while($row = mysql_fetch_array($res)){
+            if(password_verify($this->getPassword(),$row['password']) && $this->getUsername() == $row['username']){
+                $found = true;
+            }
+            $con->closeDatabase();
+            return $found;
+        }
+    
+    }
+    public function login(){
+        if ($this->isPasswordCorrect()){
+            header("Location:private_page.php");
+        }
+    }
+	 public function createUserSession(){
+        session_start();
+        $_SESSION['username'] = $this->getUsername();
+    }
+    public function logout(){
+        session_start();
+        unset($_SESSION['username']);
+        session_destroy();
+        header("Location:lab1.php");
+    }
+	
     public function setUserId($user_id){
         $this->user_id = $user_id;
     }
@@ -50,12 +81,15 @@ class User implements Crud,Authenticator
     }
 
     public function save(){
-        $conn = new DBConnector;
         $fn = $this->first_name;
         $ln = $this->last_name;
         $city = $this->city_name;
-        $query = "INSERT INTO user(first_name,last_name,user_city)VALUES('$fn','$ln','$city')";
-        $res = mysqli_query($conn->__construct(), $query) or die("Error: ". mysqli_errno($conn->__construct()));
+		$uname = $this->username;
+		$this->hashPassword();
+		$pass = $this->password;
+        $query = 
+        $res = mysql_query("INSERT INTO user(first_name,last_name,user_city,username, password)
+		VALUES('$fn','$ln','$city','$uname','$pass')") or die("Error: ". mysql_error());
         return $res;
 
     }
@@ -111,6 +145,7 @@ class User implements Crud,Authenticator
 		
 		
 }
+
 
 
 
